@@ -1,0 +1,40 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <h2 class="text-3xl font-semibold mb-4">Payment Details</h2>
+  <div id="userDetails" class="hidden">
+    <% if (bookings.length > 0) { %>
+      <% bookings.forEach(booking => { %>
+        <div class="card mb-3 p-5 bg-white shadow-md rounded-lg">
+          <h5 class="text-xl font-medium"><%= booking.user.username %> paid for <%= booking.listing.title %></h5>
+          <p class="text-gray-600">Email: <%= booking.email %></p>
+          <p class="text-gray-600">Rooms: <%= booking.roomsRequired %></p>
+          <p class="text-gray-600">Nights: <%= Math.ceil((booking.departureTime - booking.arrivalTime) / (1000 * 60 * 60 * 24)) %></p>
+          <p class="text-gray-600">Total Paid: ₹<%= booking.roomsRequired * Math.ceil((booking.departureTime - booking.arrivalTime) / (1000 * 60 * 60 * 24)) * booking.listing.price %></p>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p class="text-gray-500">No confirmed payments yet.</p>
+    <% } %>
+  </div>
+  <div id="totalEarnings" class="hidden">
+    <h3 class="text-2xl font-semibold mb-4">Total Earnings</h3>
+    <p class="text-xl font-medium">₹<%= totalEarnings %></p>
+  </div>
+</div>
+
+<script>
+  const userDetailsBtn = document.getElementById('userDetailsBtn');
+  const totalEarningsBtn = document.getElementById('totalEarningsBtn');
+  const userDetailsSection = document.getElementById('userDetails');
+  const totalEarningsSection = document.getElementById('totalEarnings');
+
+  userDetailsBtn.addEventListener('click', () => {
+    userDetailsSection.classList.remove('hidden');
+    totalEarningsSection.classList.add('hidden');
+  });
+  totalEarningsBtn.addEventListener('click', () => {
+    userDetailsSection.classList.add('hidden');
+    totalEarningsSection.classList.remove('hidden');
+  });
+</script>

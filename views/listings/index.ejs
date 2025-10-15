@@ -1,0 +1,160 @@
+<% layout("/layouts/boilerplate") %>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+<!-- Modal Styling (basic) -->
+ <script>
+        const maptoken = "<%=process.env.MAP_TOKEN%>";
+         const alllisting = <%-JSON.stringify(alllisting)%>
+ </script>
+ <style>
+#mapModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 100000;
+  }
+  
+  #mapContainer {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    margin: 5% auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  #map {
+    width: 100%;
+    height: 80%;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10000; 
+  }
+  .map-button-container {
+    position: sticky;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    z-index: 900;
+  }
+  
+  #showMapBtn {
+    background-color: #3B82F6; /* Tailwind blue-500 */
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  #showMapBtn:hover {
+    background-color: #2563EB; /* Tailwind blue-600 */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  #showMapBtn i {
+    font-size: 18px;
+  }
+</style>
+<body>
+    <!-- 'fade-up', 'fade-down', 'zoom-in', 'slide-up' 'flip-left' -->
+<h2>All Listings</h2>
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+    <% for (let listing of alllisting) { 
+        const carouselId = `carousel-${listing._id}`;
+   %>
+       <a class="listing-link" href="/listings/<%= listing._id %>">
+           <div class="card listing-card rounded overflow-hidden "data-aos="slide-up" data-aos-once="false">
+               <div id="<%= carouselId %>" class="carousel slide" data-bs-ride="carousel">
+                   <div class="carousel-indicators">
+                       <button type="button" data-bs-target="#<%= carouselId %>" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                       <button type="button" data-bs-target="#<%= carouselId %>" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                       <button type="button" data-bs-target="#<%= carouselId %>" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                   </div>
+                   <div class="carousel-inner">
+                            <% listing.image.forEach((url, i) => { %>
+                                <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                                <img
+                                    src="<%= url %>"
+                                    class="card-img-top"
+                                    alt="Slide <%= i + 1 %>"
+                                    style="height:20rem">
+                                </div>
+                            <% }) %>
+                    </div>
+                   <button class="carousel-control-prev" type="button" data-bs-target="#<%= carouselId %>" data-bs-slide="prev">
+                       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                       <span class="visually-hidden">Previous</span>
+                   </button>
+                   <button class="carousel-control-next" type="button" data-bs-target="#<%= carouselId %>" data-bs-slide="next">
+                       <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                       <span class="visually-hidden">Next</span>
+                   </button>
+               </div>
+   
+               <div class="card-img-overlay"></div>
+               <div class="card-body">
+                   <p class="card-text">
+                       <b></b><%= listing.title %><br>
+                       &#8377; <%= listing.price %>/night
+                   </p>
+               </div>
+           </div>
+       </a>
+   <% } %>
+</div>
+
+<div class="map-button-container">
+  <button id="showMapBtn">
+    <i class="fas fa-map-marked-alt"></i>
+    View Map
+  </button>
+</div>
+
+<!-- Map Modal -->
+<div id="mapModal">
+  <div id="mapContainer">
+    <span class="close-btn" onclick="closeMap()">×</span>
+    <div id="map"></div>
+  </div>
+</div>
+
+
+<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+<df-messenger
+  intent="WELCOME"
+  chat-title="wanderLustBot"
+  agent-id="2b74816e-eed8-45c3-9b80-8799ce3c8fb2"
+  language-code="en"
+></df-messenger>
+
+<script src="/js/fullmap.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 800,
+    once: false,    
+  });
+</script>
+
+</body>

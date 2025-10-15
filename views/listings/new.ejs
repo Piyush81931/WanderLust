@@ -1,0 +1,62 @@
+<% layout("/layouts/boilerplate") %>
+<body>
+
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0 rounded-lg">
+          <div class="card-header custom-header text-center py-3">
+            <h3 class="mb-0">Create New Listing</h3>
+          </div>
+          <div class="card-body p-4">
+            <form method="post" action="/listings" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input name="listings[title]" placeholder="Add a catchy title" class="form-control" type="text" required>
+                <div class="valid-feedback">Title looks good</div>
+                <div class="invalid-feedback">Title should be valid</div>
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea name="listings[description]" class="form-control" rows="4" required></textarea>
+                <div class="invalid-feedback">Write a short description</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="image" class="form-label">Image URLs</label>
+                <input name="listings[image]" placeholder="Enter 3 image URLs separated by commas" class="form-control" type="text" required>
+                <div class="form-text">Enter three image URLs separated by commas (no spaces)</div>
+              </div>
+              
+              <div class="row">
+                <div class="mb-3 col-md-4">
+                  <label for="price" class="form-label">Price</label>
+                  <input name="listings[price]" type="number" class="form-control" required>
+                  <div class="invalid-feedback">Price should be valid</div>
+                </div>
+                <div class="mb-3 col-md-8">
+                  <label for="country" class="form-label">Country</label>
+                  <input name="listings[country]" class="form-control" placeholder="India" type="text" required>
+                  <div class="invalid-feedback">Location should be valid</div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input name="listings[location]" placeholder="Jaipur" class="form-control" type="text" required>
+                <div class="invalid-feedback">Country should be valid</div>
+              </div>
+              <div class="mb-3">
+                <label for="totalroom" class="form-label">Total Room</label>
+                <input name="listings[totalRooms]" placeholder="1" class="form-control" type="number" required>
+              </div>
+              <div class="d-grid">
+                <button type="submit" class="btn custom-btn">Add Listing</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>

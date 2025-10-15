@@ -1,0 +1,57 @@
+<% layout("/layouts/boilerplate") %>
+<style>
+  .listing-card {
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .listing-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .listing-image {
+    height: 200px;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .card-text {
+    color: #6c757d;
+  }
+
+  .btn-primary {
+    border-radius: 20px;
+    padding: 5px 15px;
+    font-size: 0.9rem;
+  }
+</style>
+
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">My Hosted Listings</h2>
+
+  <% if (listings.length === 0) { %>
+    <p class="text-center">You haven’t hosted any listings yet.</p>
+  <% } else { %>
+    <div class="row">
+      <% listings.forEach(listing => { %>
+        <div class="col-sm-6 col-md-4 mb-4">
+          <div class="card listing-card shadow-sm">
+            <img src="<%= listing.image[0] %>" class="card-img-top listing-image" alt="Listing Image">
+            <div class="card-body">
+              <h5 class="card-title"><%= listing.title %></h5>
+              <p class="card-text"><%= listing.location %>, <%= listing.country %></p>
+              <a href="/listings/<%= listing._id %>" class="btn btn-primary btn-sm mb-3 ms-3">View Listing</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>

@@ -1,0 +1,43 @@
+
+<nav class="navbar navbar-expand-lg navbar-expand-md navbar-expand-sm navbar-light bg-light shadow-sm border-bottom sticky-top"
+style="width: 100% !important;">
+  <div class="container-fluid " style="width: 100vw; display: flex;">
+    <a class="navbar-brand" style="display: flex;">
+      <i class="fa-solid fa-compass me-2"></i>
+      <a class="nav-link nav-custom">WanderLust</a>
+    </a>
+  
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+       
+        <a class="nav-link nav-custom" href="listings/mytrips">My Trips</a>
+        <a class="nav-link nav-custom" href="/listings">All Listings</a>
+        <a class="nav-link nav-custom" href="owner/my-listings">My Listings</a>
+        <a class="nav-link nav-custom" href="/listings/new">Add New Listing</a>
+      </div>
+
+
+      
+
+      <form class="d-flex me-3 ms-auto" role="search" method="GET" action="/listings/search">
+        <input class="form-control me-2" type="search" name="q" placeholder="Search" aria-label="Search" required>
+        <button class="btn btn-outline-dark" type="submit"><i class="fas fa-search"></i></button>
+      </form>
+
+    
+      <div class="navbar-nav ms-auto">
+        <% if (!currUser) { %>
+          <a class="nav-link nav-custom" href="/signup">Sign Up</a>
+          <a class="nav-link nav-custom" href="/login">Log In</a>
+        <% } else { %>
+          <a class="nav-link nav-custom" href="/logout">Log Out</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+</nav>

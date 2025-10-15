@@ -1,0 +1,120 @@
+<% layout("/layouts/boilerplate") %>
+<script>
+     const maptoken = "<%=process.env.MAP_TOKEN%>";
+     const coordinates = <%- JSON.stringify(listing.geometry.coordinates) %>
+</script>
+    <div class="row mt-3">
+        <div class="col-8 offset-3"> 
+            <h3><%= listing.title %></h3>
+        </div>    
+
+        <div class="card listing-card show-card col-6 offset-3">
+            <div id="carousel-<%= listing._id %>" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <% for (let i = 0; i < listing.image.length; i++) { %>
+                        <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                            <img src="<%= listing.image[i] %>" class="card-img-top show-img" alt="listing_image" style="height: 20rem;">
+                        </div>
+                    <% } %>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel-<%= listing._id %>" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel-<%= listing._id %>" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+
+            <div class="card-body">
+                <p><i>Owned By</i><b> &nbsp;<%= listing.owner.username %></b></p>
+                <p><%= listing.description %> </p>
+                <p>&#8377; <%= listing.price %></p>
+                <p><%= listing.location %></p>
+                <p><%= listing.country %></p>
+            </div>
+        </div>
+        
+        <% if(currUser && currUser._id.equals(listing.owner._id)){ %>
+            <div class="btns mt-3">
+                <a class="btn btn-outline-dark offset-3 mb-4" href="/listings/<%= listing._id %>/edit">Edit</a>
+                <form method="post" action="/listings/<%= listing._id %>?_method=DELETE">
+                    <button class="btn btn-outline-danger offset-4 mb-4 ">Delete</button>
+                </form>
+            </div>
+        <% } %>
+        
+        <div class="col-5">
+            <div class="col offset-8">
+                <% if(currUser && currUser._id.equals(listing.owner._id)){ %>
+                    <form action="/become-owner" method="POST">
+                        <button class="btn btn-primary">Admin</button>
+                    </form>
+                <% } %>  
+            </div>
+            <div class="col offset-8 mt-2">
+                <a href="/listings/<%= listing._id %>/book" class="btn btn-outline-success">Book Now</a>
+            </div>
+        </div>
+
+        <div class="col-8 offset-3">
+            <hr>
+            <% if(currUser){ %>
+                <h4>Leave a Review</h4>
+                <form method="post" action="/listings/<%= listing._id %>/reviews" novalidate class="needs-validation">
+                    <div class="mb-3 mt-3">
+                        <label for="rating" class="form-label">Rating</label>
+                        <input class="form-control form-range" type="range" min="1" max="5" id="rating" name="review[rating]">
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="comment" class="form-label">Comments</label>
+                        <textarea class="form-control" name="review[comment]" id="comment" required></textarea>
+                        <div class="invalid-valid">Please add some comments</div>
+                    </div>
+                    <button class="btn btn-outline-dark mt-3 mb-3">Submit</button>
+                </form>
+                <hr>
+            <% } %>
+
+            <div class="row">
+                <h4>All Reviews</h4>
+                <% for (review of listing.reviews) { %>
+                    <div class="card col-5 mb-4 ms-3">
+                        <div class="card-body">
+                            <div class="card-title"><b><%= review.author.username %></b></div>
+                            <div class="card-text"><%= review.comment %></div>
+                            <div class="card-text"><%= review.rating %> &nbsp;star</div>
+                        </div>
+                        <form class="mb-3 mt-3" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=delete" method="post">
+                            <button class="btn btn-outline-danger">Delete</button>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <hr>
+        <div class="col-8 offset-3 mb-3">
+            <h3>Where you'll be</h3>
+            <div id="map"></div>
+        </div>
+
+        <script src="/js/map.js"></script>
+        
+        <hr>
+<div class="container my-4">
+  <h4>Contact the Host</h4>
+  <form action="/listings/<%= listing._id %>/contact" method="POST">
+    <div class="mb-3">
+      <label for="email" class="form-label">Your Email</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="mb-3">
+      <label for="message" class="form-label">Message</label>
+      <textarea class="form-control" id="message" name="message" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-outline-primary">Send Message</button>
+  </form>
+</div>
+

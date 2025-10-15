@@ -1,0 +1,98 @@
+<% layout("/layouts/boilerplate") %>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+<div class="flex justify-center space-x-4 mb-5">
+  <a href="/owner/payments"class="mt-5 bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600 transition">View Payments & Earnings</a>
+  <a href="/owner/dashboard?filter=pending" class="mt-5 bg-yellow-500 text-white px-6 py-2 rounded-md hover:bg-yellow-600 transition">
+    Pending
+  </a>
+  <a href="/owner/dashboard?filter=ongoing" class="mt-5 bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition">
+    Ongoing
+  </a>
+  <a href="/owner/dashboard?filter=completed" class="mt-5 bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition">
+    Completed
+  </a>
+  <a href="/owner/dashboard?filter=confirm" class="mt-5 bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-teal-600 transition">
+    Confirm
+  </a>
+  <a href="/owner/dashboard?filter=cancel" class="mt-5 bg-red-500 text-white px-6 py-2 rounded-md hover:bg-red-600 transition">
+    Cancel
+  </a>
+</div>
+
+
+
+<% if (!bookings || bookings.length === 0) { %>
+  <div class="flex justify-center items-center h-64 bg-gray-100 mt-5 mb-5 rounded-lg shadow-lg">
+      <p class="text-lg text-gray-700">No bookings available at the moment.</p>
+  </div>
+<% } else { %>
+  <% bookings.forEach(b => { 
+    const now = new Date();
+    const arrival = new Date(b.arrivalTime);
+    const departure = new Date(b.departureTime);
+
+    let bookingStatus = '';
+    if (b.status === 'cancelled') {
+        bookingStatus = 'Cancelled';
+    } else if (now < arrival) {
+        bookingStatus = 'Upcoming';
+    } else if (now >= arrival && now <= departure) {
+        bookingStatus = 'Ongoing';
+    } else {
+        bookingStatus = 'Completed';
+    }
+  %>
+
+  <div class="bg-white/50 backdrop-blur-md border border-gray-200 shadow-lg rounded-2xl p-5 flex flex-col justify-between hover:shadow-2xl transition duration-300 mb-10 mt-10">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-800"><%= b.listing ? b.listing.title : 'Listing Unavailable' %></h2>
+        <span class="text-xs px-2 py-1 rounded-full capitalize 
+            <% if (bookingStatus === 'Upcoming') { %> bg-yellow-100 text-yellow-700 
+            <% } else if (bookingStatus === 'Ongoing') { %> bg-green-100 text-green-700 
+            <% } else if (bookingStatus === 'Cancelled') { %> bg-red-100 text-red-700 
+            <% } else { %> bg-gray-200 text-gray-700 <% } %>">
+            <%= bookingStatus %>
+        </span>
+    </div>
+
+    <!-- Guest Info -->
+    <div class="text-sm text-gray-700 space-y-1 mb-4">
+        <p><strong>Guest:</strong> <%= b.username %></p>
+        <p><strong>Email:</strong> <%= b.email || 'N/A' %></p>
+        <p><strong>Phone:</strong> <%= b.phone || 'N/A' %></p>
+        <p><strong>Message:</strong> <%= b.message || 'No message' %></p>
+    </div>
+
+    <div class="text-sm text-gray-600 mb-4 space-y-1">
+        <p><strong>Room:</strong> <%= b.roomType %> x <%= b.roomsRequired %></p>
+        <p><strong>Guests:</strong> <%= b.totalGuests %></p>
+        <p><strong>Arrival:</strong> <%= new Date(b.arrivalTime).toLocaleDateString() %></p>
+        <p><strong>Departure:</strong> <%= new Date(b.departureTime).toLocaleDateString() %></p>
+    </div>
+
+    <div class="flex space-x-2">
+    <% if (bookingStatus === "Upcoming") { %>
+      <% if (b.isConfirmed) { %>
+          <form action="/owner/bookings/<%= b._id %>/cancel" method="POST">
+              <button class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 text-sm">Cancel</button>
+          </form>
+      <% } else { %>
+          <form action="/owner/bookings/<%= b._id %>/confirm" method="POST">
+              <button class="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 text-sm">Confirm</button>
+          </form>
+          <form action="/owner/bookings/<%= b._id %>/cancel" method="POST">
+              <button class="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 text-sm">Cancel</button>
+          </form>
+      <% } %>
+    <% } else if (bookingStatus === "Cancelled") { %>
+        <form action="/owner/bookings/<%= b._id %>?_method=Delete" method="POST">
+            <button class="bg-red-700 text-white px-4 py-1 rounded hover:bg-red-800 text-sm">Delete</button>
+        </form>
+    <% } else if (bookingStatus === "Completed") { %>
+        <span class="text-sm text-gray-400">✔ Completed</span>
+    <% } %>
+    </div>
+  </div>
+  <% }); %>
+<% } %>

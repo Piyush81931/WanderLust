@@ -1,0 +1,228 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  :root {
+    --bg: #198754;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    height: 100%;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #top-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    margin-left: -50vw;
+    background-color: var(--bg);
+    padding: 20px 0 140px;
+    z-index: 1;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
+
+  .inner-container-content {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+
+  .btn-group {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 10px;
+  }
+
+  .btn-group button {
+    background: #fff;
+    border: none;
+    color: #000;
+    padding: 10px 20px;
+    margin-right: 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .btn-group button.active {
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+  }
+
+  #content-wrapper {
+    position: relative;
+    z-index: 2;
+    margin-top: -100px;
+  }
+
+  .tab-content {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .trip-card {
+    background: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+  }
+
+  .trip-card h5 { font-size: 18px; font-weight: bold; }
+  .trip-card p { margin: 5px 0; }
+
+  .cancelled { background-color: #f8d7da; }
+  .btn-danger { margin-top: 10px; }
+</style>
+
+<body>
+  <div id="top-section">
+    <div class="inner-container-content">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent text-white mb-3">
+          <li class="breadcrumb-item">My Account</li>
+          <li class="breadcrumb-item active" aria-current="page">My Trips</li>
+        </ol>
+      </nav>
+      <div class="btn-group" role="group">
+        <button onclick="showTab('upcoming')">Upcoming</button>
+        <button onclick="showTab('ongoing')">Ongoing</button>
+        <button onclick="showTab('completed')">Completed</button>
+        <button onclick="showTab('cancelled')">Cancelled</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="content-wrapper">
+    <div class="inner-container-content">
+      <div id="upcoming" class="tab-content">
+        <% if (upcoming.length) { %>
+          <% upcoming.forEach(booking => { %>
+            <div class="trip-card">
+              <h5><%= booking.listing.title %></h5>
+              <p>Arrival: <%= booking.arrivalTime.toLocaleString() %></p>
+              <p>Departure: <%= booking.departureTime.toLocaleString() %></p>
+              <p>Guests: <%= booking.totalGuests %></p>
+              <p>Room Type: <%= booking.roomType %></p>
+              <p>Rooms: <%= booking.roomsRequired %></p>
+              <% if (booking.message) { %><p>Note: <%= booking.message %></p><% } %>
+              <%
+  const arrival = new Date(booking.arrivalTime);
+  const departure = new Date(booking.departureTime);
+  const nights = Math.ceil((departure - arrival) / (1000 * 60 * 60 * 24));
+  const totalPrice = nights * booking.roomsRequired * booking.listing.price;
+%>
+
+<p>Total Nights: <%= nights %></p>
+<p>Price per Night: ₹<%= booking.listing.price %></p>
+<p><strong>Total Price:</strong> ₹<%= totalPrice %></p>
+
+<% if (!booking.isConfirmedUser) { %>
+  <form action="/userbookings/<%= booking._id %>/confirm" method="POST">
+    <button class="btn btn-success btn-sm mt-2">Confirm Payment</button>
+  </form>
+<% } else { %>
+  <p class="text-success mt-2"><strong>Booking Confirmed ✅</strong></p>
+<% } %>
+
+              <% if ((booking.arrivalTime - Date.now()) > 86400000) { %>
+                <form action="/booking/cancel/<%= booking._id %>" method="POST">
+                  <button type="submit" class="btn btn-danger btn-sm">Cancel Trip</button>
+                </form>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No upcoming trips.</p>
+        <% } %>
+      </div>
+
+      <div id="ongoing" class="tab-content d-none">
+        <% if (ongoing.length) { %>
+          <% ongoing.forEach(booking => { %>
+            <div class="trip-card">
+              <h5><%= booking.listing.title %></h5>
+              <p>Arrival: <%= booking.arrivalTime.toLocaleString() %></p>
+              <p>Departure: <%= booking.departureTime.toLocaleString() %></p>
+              <p>Guests: <%= booking.totalGuests %></p>
+              <p>Room Type: <%= booking.roomType %></p>
+              <p>Rooms: <%= booking.roomsRequired %></p>
+              <% if (booking.message) { %><p>Note: <%= booking.message %></p><% } %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No ongoing trips.</p>
+        <% } %>
+      </div>
+
+      <div id="completed" class="tab-content d-none">
+        <% if (completed.length) { %>
+          <% completed.forEach(booking => { %>
+            <div class="trip-card">
+              <h5><%= booking.listing.title %></h5>
+              <p>Arrival: <%= booking.arrivalTime.toLocaleString() %></p>
+              <p>Departure: <%= booking.departureTime.toLocaleString() %></p>
+              <p>Guests: <%= booking.totalGuests %></p>
+              <p>Room Type: <%= booking.roomType %></p>
+              <p>Rooms: <%= booking.roomsRequired %></p>
+              <% if (booking.message) { %><p>Note: <%= booking.message %></p><% } %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No completed trips.</p>
+        <% } %>
+      </div>
+
+      <div id="cancelled" class="tab-content d-none">
+        <% if (cancelled.length) { %>
+          <% cancelled.forEach(booking => { %>
+            <div class="trip-card cancelled">
+              <h5><%= booking.listing.title %></h5>
+              <p><strong>Cancelled</strong></p>
+              <p>Arrival: <%= booking.arrivalTime.toLocaleString() %></p>
+              <p>Departure: <%= booking.departureTime.toLocaleString() %></p>
+              <p>Guests: <%= booking.totalGuests %></p>
+              <p>Room Type: <%= booking.roomType %></p>
+              <p>Rooms: <%= booking.roomsRequired %></p>
+              <% if (booking.message) { %><p>Note: <%= booking.message %></p><% } %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>No cancelled trips.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(tab) {
+      ['upcoming','ongoing','completed','cancelled'].forEach(id => {
+        document.getElementById(id).classList.add('d-none');
+      });
+      document.getElementById(tab).classList.remove('d-none');
+      document.querySelectorAll('.btn-group button').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase() === tab);
+      });
+      const colors = {
+        upcoming: '#198754',
+        ongoing:   '#007bff',
+        completed: '#6c757d',
+        cancelled: '#ffc107'
+      };
+      document.documentElement.style.setProperty('--bg', colors[tab]);
+    }
+    document.addEventListener('DOMContentLoaded', () => showTab('upcoming'));
+  </script>
+</body>
