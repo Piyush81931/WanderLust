@@ -25,4 +25,4 @@ WanderLust is a travel website that allows users to explore destinations, view b
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/WanderLust.git
+   git clone https://github.com/piyush81931/WanderLust.git
